@@ -10,5 +10,8 @@ logger.critical("严重错误信息")
 logger.level("DEBUG")
 
 
-
+try:
+    1/0
+except Exception as e:
+    logger.exception(e)
 
