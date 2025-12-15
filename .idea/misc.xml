@@ -4,5 +4,5 @@
     <option name="pathToExecutable" value="D:\Program Files\Anaconda3\Scripts\black.exe" />
     <option name="sdkName" value="LLM_RAG_Agent" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="LLM_RAG_Agent" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="xhs_ugc" project-jdk-type="Python SDK" />
 </project>

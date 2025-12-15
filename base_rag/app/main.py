@@ -1,5 +1,8 @@
+import json
 import time
 
+from uuid import uuid4
+from aiohttp.web_response import StreamResponse
 from fastapi import FastAPI
 from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
@@ -87,4 +90,29 @@ async def stream_response(query, history, session_id):
             yield chunk
 
 
+
+@app.post("/api/query/stream")
+async def query_stream(request: QueryRequest):
+    sid = str(uuid4())
+    return StreamResponse((f"data: {json.dumps(chunk)}\n\n" async for chunk in stream_response(request.query, request.history, sid)),
+                            media_type="text/event-stream",headers ={"Cache-Control": "no-cache","Connection":"keep-alive"})
+
+
+@app.websocket("api/websocket")
+async def websocket_endpoint(websocket):
+    await websocket.accept()
+    while True:
+        data = await websocket.receive_json()
+        query = data.get("query").strip()
+        history = data.get("history", [])
+        if not query:
+            await websocket.send_json({"type":"error","error": "请输入查询内容"})
+            continue
+        sid = str(uuid4())
+        await websocket.send_json({"type":"start","session_id":sid})
+        async for chunk in stream_response(query, history, sid):
+            if chunk.get("complete"):
+                await websocket.send_json({"type":"end","complete":True,"session_id":sid,"processing_time":chunk.get("processing_time",0)})
+            else:
+                await websocket.send_json({"type": "token", "token": chunk.get("token", ""), "session_id": chunk.get("session_id", ""), "query_type": chunk.get("query_type", "unknown")})
 
