@@ -1,7 +1,7 @@
 from openai import AsyncClient
 from conf import settings
 client = AsyncClient(api_key=settings.api_key,base_url=settings.base_url)
-
+from log import logger
 async def chat(query,history,system_prompt="你是一个热点文案撰写专家，根据提供的信息分析出热点营销的模板，之后请根据用户的问题完成相应热点营销文案的生成。要求：新颖，以引流为主。"):
     if history is None:
         history = []
@@ -17,5 +17,4 @@ async def chat(query,history,system_prompt="你是一个热点文案撰写专家
     )
     return stream
 if __name__ == '__main__':
-    # print(chat("请生成一篇关于美妆的文案"))
     pass
